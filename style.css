@@ -1,57 +1,204 @@
+/* Hide game area until game mode selected */
+#game_area {
+  display: none;
+}
+
+.show-board {
+  display: flex !important;
+}
+
+/* GLOBAL */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: Arial,sans-serif; 
-    text-align: center; 
-    background: #f4f4f4; 
+  font-family: "VT323", monospace;
+  background: #fff6e5;
+  text-align: center;
+  color: #3a3535;
+  padding: 20px;
 }
 
-.hidden {
-    display: none; 
+header {
+  margin: 20px 0 40px;
 }
 
-#color-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 40px);
-    grid-template-rows: repeat(2, 40px); gap:10px;
-    justify-content:center; margin: 20px auto;
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: 0.3rem;
 }
 
-.color-option {
-    width: 40px;
-    height: 40px;
-    border:2px solid #888;
-    cursor:pointer;
-    border-radius:50%;
+/* MENU */
+#menu {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 40px auto;
+  align-items: center;
+  text-align: center;
 }
 
-.selected {
-    border:3px solid #222;
+#menu button {
+  width: 180px;
+  height: 55px;
+  background: #e3c29c;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-#pattern, #guess {
-    display:flex;
-    justify-content:center;
-    margin:10px 0; 
+#menu button:hover {
+  transform: scale(1.05);
+  background: #f4d3b3;
 }
 
-.peg {
-    width:34px;
-    height:34px;
-    margin:2px;
-    border-radius:50%;
-    border:1px solid #555;
-    background:#dedede;
-    display:inline-block;
-    cursor:pointer;
+/* LAYOUT */
+main {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-button {
-    margin:12px;
-    padding:10px 30px;
-    font-size:16px;
+/* BOARD */
+.board {
+  width: 320px;
+  padding: 15px;
+  border-radius: 20px;
+  background: #f0d8b7;
+  border: 4px solid #d3b28a;
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-#endpage {
-    font-size:22px;
-    margin-top:30px;
+.left, .right {
+  display: grid;
+  grid-template-rows: repeat(12, 1fr);
+  gap: 6px;
+  padding: 5px;
+}
+
+.pin_container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.big_pin, .guess_pin {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #c8b19a;
+  border: 3px solid #fff;
+  transition: 0.15s;
+  margin: auto;
+}
+
+.big_pin:hover, .guess_pin:hover {
+  transform: scale(1.1);
+}
+
+/* Answer row */
+#answer {
+  border-bottom: 3px solid #d3b28a;
+  padding-bottom: 10px;
+}
+#answer .big_pin {
+  background: #bca58b;
+  color: #fff3dc;
+}
+
+/* Small pins */
+.small_pin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #edd4b6;
+  border: 2px solid white;
+  margin: auto;
+}
+
+.ans_container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+/* Color selector */
+#color_select {
+  border-top: 3px solid #d7b791;
+  padding-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.selector_pin {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: 0.15s;
+  margin: auto;
+}
+.selector_pin:hover {
+  transform: scale(1.15);
+}
+
+#red { background: #ff0000; }
+#blue { background: #0000ff; }
+#green { background: #00ff00; }
+#yellow { background: #ffe17a; }
+#purple { background: #ff00ff; }
+#orange { background: #ffb313; }
+
+/* RIGHT PANEL */
+.main_right {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.button {
+  width: 180px;
+  height: 55px;
+  background: #c8c8c8;
+  border: 3px solid #ececec;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  color: white;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  background: #dddddd;
+}
+
+.feedback_container {
+  height: 80px;
+  font-size: 1.2rem;
+  padding: 10px;
+  color: #d44;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  h1 { font-size: 2.6rem; }
+  .board { width: 280px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 2rem; }
+  .board { width: 250px; }
 }
