@@ -1,17 +1,20 @@
 // Menu functions
 function start1v1(){
 	gamemode = "1v1"
-	document.getElementById("game_area").classList.add("show-board");
-	document.getElementById("menu").style.display = "none";
+	document.getElementById("pattern_area").classList.remove("hidden");
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("pattern_area").classList.remove("hidden");
 	initPatternSet();
 }
+
 function startvPC() {
   gameMode = "1vPC";
   pattern = Array.from({ length: 6 }, () => colors[Math.floor(Math.random() * 6)]);
-    document.getElementById("game_area").classList.add("show-board");
-    document.getElementById("menu").style.display = "none";
+    document.getElementById("game_area").classList.remove("hidden");
+    document.getElementById("menu").classList.add("hidden");
   prepareGuessing("Guess the PC's pattern!");
 }
+
 
 // Color choices
 const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
@@ -20,7 +23,7 @@ let pattern = [];
 let guesses = [];
 let currentGuess = new Array(6).fill(null);
 let selectedPegIndex = 0;  // Selected peg index for editing
-let turn = 0; 
+let turn = 0;
 
 // Pattern making (for P1)
 function initPatternSet() {
@@ -122,3 +125,4 @@ function endGame(win) {
   document.getElementById("endpage").classList.remove("hidden");
   document.getElementById("endmsg").innerText = win ? "You won!" : "You lost!";
 }
+
