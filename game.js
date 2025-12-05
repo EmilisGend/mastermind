@@ -1,128 +1,223 @@
-// Menu functions
-function start1v1(){
-	gamemode = "1v1"
-	document.getElementById("pattern_area").classList.remove("hidden");
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById("pattern_area").classList.remove("hidden");
-	initPatternSet();
+// -------------------- GLOBAL STATE --------------------
+const COLORS = ["red", "blue", "green", "yellow", "purple", "orange"];
+let secretPattern = []; // 4 colors
+let currentGuess = ["", "", "", ""];
+let currentRow = 1;
+let gameActive = false;
+let patternMode = false;
+
+// DOM ELEMENTS
+const menu = document.getElementById("menu");
+const patternArea = document.getElementById("pattern_area");
+const gameArea = document.getElementById("game_area");
+const feedbackBox = document.querySelector(".feedback_container");
+
+const guessSlots = document.querySelectorAll("#guess .guess_pin");
+const colorButtons = document.querySelectorAll("#color_select .selector_pin");
+
+// -------------------- GAME MODE SELECTION --------------------
+function start1v1() {
+    menu.classList.add("hidden");
+    patternArea.classList.remove("hidden");
+    patternMode = true;
+    feedbackBox.textContent = "Player 1: Create a pattern.";
 }
 
 function startvPC() {
-  gameMode = "1vPC";
-  pattern = Array.from({ length: 6 }, () => colors[Math.floor(Math.random() * 6)]);
-    document.getElementById("game_area").classList.remove("hidden");
-    document.getElementById("menu").classList.add("hidden");
-  prepareGuessing("Guess the PC's pattern!");
+    menu.classList.add("hidden");
+
+    // Generate random computer pattern
+    secretPattern = Array.from({ length: 4 }, () =>
+        COLORS[Math.floor(Math.random() * COLORS.length)]
+    );
+
+    console.log("SECRET PATTERN:", secretPattern);
+
+    startGame();
 }
 
+// -------------------- PLAYER SETS PATTERN --------------------
+const patternPins = document.querySelectorAll("#pattern_answer .big_pin");
+const patternColors = document.querySelectorAll("#pattern_color_select .selector_pin");
 
-// Color choices
-const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
-let gamemode = ""
-let pattern = [];
-let guesses = [];
-let currentGuess = new Array(6).fill(null);
-let selectedPegIndex = 0;  // Selected peg index for editing
-let turn = 0;
+patternPins.forEach(pin => {
+    pin.addEventListener("click", () => {
+        patternPins.forEach(p => p.classList.remove("selected"));
+        pin.classList.add("selected");
+    });
+});
 
-// Pattern making (for P1)
-function initPatternSet() {
-  document.getElementById("makePattern").classList.remove("hidden");
-  makeColorGrid("color-grid", (color) => selectPeg(color));
-  pattern = [];
-  updatePegsDisplay("pattern", pattern, true);
-}
-function selectPeg(color) {
-  if (pattern.length < 6) pattern.push(color);
-  updatePegsDisplay("pattern", pattern, true);
-}
-function updatePegsDisplay(elem, arr, allowDel, allowSelect = false) {
-  let html = "";
-  arr.forEach((clr, idx) => {
-    const isSelected = allowSelect && idx === selectedPegIndex ? "selected" : "";
-    const clrStyle = clr ? `background:${clr}` : "";
-    html += `<div class="peg ${isSelected}" style="${clrStyle}" onclick="${allowSelect ? `selectPegIndex(${idx})` : ""}"></div>`;
-  });
-  for (let i = arr.length; i < 6; i++) html += '<div class="peg"></div>';
-  document.getElementById(elem).innerHTML = html;
-}
-function deletePeg(idx) {
-  pattern.splice(idx, 1);
-  updatePegsDisplay("pattern", pattern, true);
-}
-function confirmPattern() {
-  if (pattern.length < 6) {
-    alert("Choose 6 colors!");
-    return;
-  }
-  document.getElementById("makePattern").classList.add("hidden");
-  turn = 1; // Switch to guessing
-  prepareGuessing("Player 2: Make your guess!");
-}
-// Guessing
-function prepareGuessing(prompt) {
-  guesses = [];
-  currentGuess = new Array(6).fill(null);
-  selectedPegIndex = 0;
-  document.getElementById("guessSection").classList.remove("hidden");
-  document.getElementById("oldGuesses").innerHTML = ""; // Clear old guesses list
-  document.getElementById("guessPrompt").innerText = prompt;
-  updatePegsDisplay("guess", currentGuess, false, true); // enable peg selecting
-  makeColorGrid("color-grid-guess", (color) => selectGuessPeg(color));
-}
-function selectPegIndex(idx) {
-  selectedPegIndex = idx;
-  updatePegsDisplay("guess", currentGuess, false, true);
-}
-function selectGuessPeg(color) {
-  currentGuess[selectedPegIndex] = color;
-  updatePegsDisplay("guess", currentGuess, false, true);
-}
-function submitGuess() {
-  if (currentGuess.includes(null)) {
-    alert("Fill all 6 pegs!");
-    return;
-  }
-  guesses.push([...currentGuess]);
+patternColors.forEach(colorBtn => {
+    colorBtn.addEventListener("click", () => {
+        const selected = document.querySelector("#pattern_answer .big_pin.selected");
+        if (!selected) return;
 
-  // Show old guesses on screen
-  const oldGuessDiv = document.createElement("div");
-  oldGuessDiv.style.margin = "5px";
-  oldGuessDiv.style.display = "flex";
-  currentGuess.forEach(c => {
-    const pegDiv = document.createElement("div");
-    pegDiv.className = "peg";
-    pegDiv.style.backgroundColor = c;
-    oldGuessDiv.appendChild(pegDiv);
-  });
-  document.getElementById("oldGuesses").appendChild(oldGuessDiv);
+        const color = colorBtn.id;
+        selected.style.background = color;
+        selected.dataset.color = color;
+        selected.classList.remove("selected");
 
-  if (isCorrectGuess(pattern, currentGuess)) {
-    endGame(true);
-  } else if (guesses.length >= 12) {
-    endGame(false);
-  } else {
-    currentGuess = new Array(6).fill(null);
-    selectedPegIndex = 0;
-    updatePegsDisplay("guess", currentGuess, false, true);
-    alert("Try again!");
-  }
-}
-function isCorrectGuess(pattern, guess) {
-  return JSON.stringify(pattern) === JSON.stringify(guess);
+        // Check if all 4 colors are chosen
+        const filled = [...patternPins].every(pin => pin.dataset.color);
+        if (filled) {
+            secretPattern = [...patternPins].map(p => p.dataset.color);
+            console.log("1v1 SECRET PATTERN:", secretPattern);
+
+            patternArea.classList.add("hidden");
+            startGame();
+        }
+    });
+});
+
+
+// -------------------- START GAME --------------------
+function startGame() {
+    gameArea.classList.remove("hidden");
+    gameActive = true;
+    feedbackBox.textContent = "Make a guess!";
 }
 
-// Coloring support
-function makeColorGrid(id, cb) {
-  document.getElementById(id).innerHTML = colors
-    .map((c) => `<div class="color-option" style="background:${c}" onclick="(${cb})('${c}')"></div>`)
-    .join("");
+// -------------------- COLOR SELECTION FOR GUESSES --------------------
+let guessIndex = 0;
+
+colorButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (!gameActive) return;
+
+        if (guessIndex < 4) {
+            const color = btn.id;
+            guessSlots[guessIndex].style.background = color;
+            currentGuess[guessIndex] = color;
+            guessIndex++;
+        }
+    });
+});
+
+// -------------------- CLEAR CURRENT GUESS --------------------
+document.getElementById("clear").addEventListener("click", () => {
+    currentGuess = ["", "", "", ""];
+    guessIndex = 0;
+
+    guessSlots.forEach(pin => {
+        pin.style.background = "rgb(207, 187, 165)";
+    });
+
+    feedbackBox.textContent = "Guess cleared.";
+});
+
+// -------------------- CHECK GUESS --------------------
+document.getElementById("check").addEventListener("click", () => {
+    if (!gameActive) return;
+
+    if (currentGuess.includes("")) {
+        feedbackBox.textContent = "You must pick 4 colors!";
+        return;
+    }
+
+    let rowID = `guess${currentRow}`;
+    const rowPins = document.querySelectorAll(`#${rowID} .big_pin`);
+
+    // Fill guess on the board
+    rowPins.forEach((pin, i) => {
+        pin.style.background = currentGuess[i];
+    });
+
+    // Evaluate guess
+    const evaluation = evaluateGuess(currentGuess, secretPattern);
+    showFeedback(evaluation, currentRow);
+
+    if (evaluation.black === 4) {
+        feedbackBox.textContent = "You Win! Great job!";
+        revealAnswer();
+        gameActive = false;
+        return;
+    }
+
+    currentRow++;
+
+    if (currentRow > 10) {
+        feedbackBox.textContent = "Out of guesses! You lose!";
+        revealAnswer();
+        gameActive = false;
+        return;
+    }
+
+    currentGuess = ["", "", "", ""];
+    guessIndex = 0;
+
+    guessSlots.forEach(pin => {
+        pin.style.background = "rgb(207, 187, 165)";
+    });
+
+    feedbackBox.textContent = "Next guess!";
+});
+
+// -------------------- EVALUATION LOGIC --------------------
+function evaluateGuess(guess, answer) {
+    let black = 0; // correct color + correct position
+    let white = 0; // correct color but wrong position
+
+    let answerCopy = [...answer];
+    let guessCopy = [...guess];
+
+    // First pass — black pins
+    guessCopy.forEach((color, i) => {
+        if (color === answerCopy[i]) {
+            black++;
+            guessCopy[i] = answerCopy[i] = null;
+        }
+    });
+
+    // Second pass — white pins
+    guessCopy.forEach(color => {
+        if (color && answerCopy.includes(color)) {
+            white++;
+            answerCopy[answerCopy.indexOf(color)] = null;
+        }
+    });
+
+    return { black, white };
 }
 
-// End and restart
-function endGame(win) {
-  document.getElementById("guessSection").classList.add("hidden");
-  document.getElementById("endpage").classList.remove("hidden");
-  document.getElementById("endmsg").innerText = win ? "You won!" : "You lost!";
+// -------------------- SHOW FEEDBACK PINS --------------------
+function showFeedback(evaluation, row) {
+    const feedbackRow = document.querySelectorAll(`.right .ans_container`)[row];
+
+    let pins = feedbackRow.querySelectorAll(".small_pin");
+
+    let colorPins = [];
+    for (let i = 0; i < evaluation.black; i++) colorPins.push("black");
+    for (let i = 0; i < evaluation.white; i++) colorPins.push("white");
+
+    colorPins.forEach((c, i) => {
+        pins[i].style.background = c === "black" ? "#000" : "#fff";
+    });
 }
 
+// -------------------- REVEAL SECRET PATTERN --------------------
+function revealAnswer() {
+    const ansPins = document.querySelectorAll("#answer .big_pin");
+
+    ansPins.forEach((pin, i) => {
+        pin.style.background = secretPattern[i];
+        pin.textContent = "";
+    });
+}
+
+// -------------------- RESET --------------------
+document.getElementById("reset").addEventListener("click", () => {
+    location.reload();
+});
+
+// -------------------- INSTRUCTIONS POPUP --------------------
+document.getElementById("instructions").addEventListener("click", () => {
+    alert(`
+Mastermind Instructions:
+
+• Choose a game mode.
+• Pick 4 colors each guess.
+• Black = Correct color & position.
+• White = Correct color but wrong position.
+• Try to guess the pattern in 10 turns!
+`);
+});
