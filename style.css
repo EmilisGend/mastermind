@@ -1,4 +1,3 @@
-/* Hide game area until game mode selected */
 #game_area {
   display: flex;
   opacity: 1;
@@ -7,9 +6,10 @@
 
 #game_area.hidden {
   opacity: 0;
+  display: none;
 }
 
-/* GLOBAL */
+/* OG code */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -52,7 +52,7 @@ h1 {
 #menu button {
   width: 180px;
   height: 55px;
-  background: #e3c29c;
+  background: #ecd6b9;
   border: none;
   border-radius: 12px;
   color: white;
@@ -81,6 +81,7 @@ h1 {
   opacity: 0;
   height: 0;
   margin: 0;
+  display: none;
 }
 
 /* LAYOUT */
@@ -91,17 +92,6 @@ main {
   flex-wrap: wrap;
 }
 
-/* BOARD */
-.board {
-  border: 5px solid #d7b791;
-  border-radius: 20px;
-  display: grid;
-  grid-template-columns: 6fr 2fr;
-  width: 300px;
-  margin-right: 20px;
-  background-color: #ecd6b9;
-  color: rgb(114, 114, 114);
-}
 .left {
   border-right: 2px solid#D7B791;
   display: grid;
@@ -197,29 +187,6 @@ main {
 #purple { background: #ff00ff; }
 #orange { background: #ffb313; }
 
-/* RIGHT PANEL */
-.main_right {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
-}
-
-.button {
-  width: 180px;
-  height: 55px;
-  background: #c8c8c8;
-  border: 3px solid #ececec;
-  border-radius: 12px;
-  font-size: 1.4rem;
-  color: white;
-  display: flex;
-  justify-content: center;
-  cursor: pointer;
-  align-items: center;
-  transition: 0.2s;
-}
-
 .button:hover {
   transform: scale(1.05);
   background: #dddddd;
@@ -247,7 +214,7 @@ main {
 }
 
 body {
-  font-family: "VT323", monospace;
+  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   background-color: #fff9e8;
 }
@@ -278,21 +245,18 @@ h4 {
 }
 
 .main_left {
-  /* border: 1px solid fuchsia; */
   display: flex;
   justify-content: flex-end;
   /* align-items: ; */
 }
 
 .main_right {
-  /* border: 1px solid fuchsia; */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
-}
+} 
 .gameplay {
-  /* border: 1px solid pink; */
   display: flex;
 }
 
@@ -429,29 +393,6 @@ h4 {
   font-size: 20px;
   line-height: 20%;
   background-color: rgb(184, 161, 134);
-}
-#red {
-  background-color: #ff8097;
-}
-
-#blue {
-  background-color: #92d6e2;
-}
-
-#green {
-  background-color: #9fec98;
-}
-
-#yellow {
-  background-color: #ffe992;
-}
-
-#orange {
-  background-color: #ffc59e;
-}
-
-#purple {
-  background-color: #b4a1e2;
 }
 
 .button {
